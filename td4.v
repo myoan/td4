@@ -1,4 +1,4 @@
-`define LEN_CLOCK 5000000 / 10
+`define LEN_CLOCK 500000
 module td4(clk, rst, led);
     input clk, rst;
     wire a, b, cout;
@@ -9,6 +9,10 @@ module td4(clk, rst, led);
 
     reg [26:0] counter;
     reg td4_clk;
+
+    initial begin
+        td4_clk = 0;
+    end
 
     always @(posedge clk) begin
         if (rst | counter == `LEN_CLOCK - 1) begin
