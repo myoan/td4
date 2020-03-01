@@ -1,10 +1,23 @@
-module td4(clk, rst);
+`define LEN_CLOCK 5000000 / 10
+module td4(clk, rst, led);
     input clk, rst;
     wire a, b, cout;
     reg c;
     wire[3:0] op, im, s, y, in;
     wire[3:0] q0, q1, q2, q3;
-   
+    output[3:0] led;
+
+    reg [26:0] counter;
+    reg td4_clk;
+
+    always @(posedge clk) begin
+        if (rst | counter == `LEN_CLOCK - 1) begin
+	          counter <= 0;
+	          td4_clk <= ~td4_clk;
+	      end else
+	          counter <= counter + 1'b1;
+	  end
+
     memory mem_ins(.pc(q3),.op(op),.im(im));
     decoder dcd_ins(.op(op),.cin(c),.a(a),.b(b),.s(s));
 
@@ -15,10 +28,11 @@ module td4(clk, rst);
         c = cout;
     end
 
-    register r1_ins(.clk(clk),.rst(rst),.ld(s[3]),.in(in),.q(q0));
-    register r2_ins(.clk(clk),.rst(rst),.ld(s[2]),.in(in),.q(q1));
-    register r3_ins(.clk(clk),.rst(rst),.ld(s[1]),.in(in),.q(q2));
-    program_counter pc_ins(.clk(clk),.rst(rst),.ld(s[0]),.in(in),.q(q3));
+    register r1_ins(.clk(td4_clk),.rst(rst),.ld(s[3]),.in(in),.q(q0));
+    register r2_ins(.clk(td4_clk),.rst(rst),.ld(s[2]),.in(in),.q(q1));
+    register r3_ins(.clk(td4_clk),.rst(rst),.ld(s[1]),.in(in),.q(q2));
+    program_counter pc_ins(.clk(td4_clk),.rst(rst),.ld(s[0]),.in(in),.q(q3));
+    assign led = q2;
 endmodule
 
 /*
