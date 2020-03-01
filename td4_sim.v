@@ -1,6 +1,7 @@
 module top();
   reg CLK, RST_X;
-  td4 td4_instance(CLK, RST_X);
+  wire[3:0] LED;
+  td4 td4_instance(CLK, RST_X, LED);
 
   initial begin
     CLK = 0;
