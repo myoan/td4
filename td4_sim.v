@@ -14,7 +14,7 @@ module top();
   end
 
   initial begin
-    #5000 $finish();
+    #3000 $finish();
   end
 
   initial begin

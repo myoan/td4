@@ -1,3 +1,4 @@
+// `define LEN_CLOCK 10
 `define LEN_CLOCK 50000000
 module td4(clk, rst, led);
     input clk, rst;
@@ -12,6 +13,7 @@ module td4(clk, rst, led);
 
     initial begin
         td4_clk = 1'b0;
+        c = 1'b0;
     end
 
     always @(posedge clk) begin
@@ -29,8 +31,10 @@ module td4(clk, rst, led);
     alu a_ins(.y(y),.im(im),.sgm(in),.cout(cout));
 
     always @(cout) begin
-        $write("[%t] exec ALU: cout: %b, sgm: %b\n", $time, cout, in);
-        c <= cout;
+        if (cout) begin
+            $write("[%t] ALU: cout: %b, sgm: %b\n", $time, cout, in);
+            c <= cout;
+        end
     end
 
     register r1_ins(.clk(td4_clk),.rst(rst),.ld(s[3]),.in(in),.q(q0));
