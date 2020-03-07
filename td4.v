@@ -1,5 +1,5 @@
 // `define LEN_CLOCK 10
-`define LEN_CLOCK 50000000
+`define LEN_CLOCK 5000000
 module td4(clk, rst, led);
     input clk, rst;
     wire a, b, cout;
@@ -30,11 +30,9 @@ module td4(clk, rst, led);
     data_selector ds_ins(.op(op),.r1(q0),.r2(q1),.y(y));
     alu a_ins(.y(y),.im(im),.sgm(in),.cout(cout));
 
-    always @(cout) begin
-        if (cout) begin
-            $write("[%t] ALU: cout: %b, sgm: %b\n", $time, cout, in);
-            c <= cout;
-        end
+    always @(posedge td4_clk) begin
+        $write("[%t] ALU: cout: %b, sgm: %b\n", $time, cout, in);
+        c <= cout;
     end
 
     register r1_ins(.clk(td4_clk),.rst(rst),.ld(s[3]),.in(in),.q(q0));
@@ -68,6 +66,7 @@ module memory(pc, op, im);
 endmodule
 */
 
+/*
 // 1min timer
 module memory(pc, op, im);
     input [3:0] pc;
@@ -82,15 +81,13 @@ module memory(pc, op, im);
             4'b0010: {op, im} = 8'b00000001; // ADD A,0001
             4'b0011: {op, im} = 8'b11100000; // JNC 0000
             4'b0100: {op, im} = 8'b10111000; // OUT 1000
-            4'b0101: {op, im} = 8'b11110101; // JMP 1111
-            default: {op, im} = 8'b00000000;
+            4'b0101: {op, im} = 8'b11110101; // JMP 0101
         endcase
         $write("[%t] memory(%b): %b\n", $time, pc, {op, im});
     end
 endmodule
+*/
 
-
-/*
 // 3min timer
 module memory(pc, op, im);
     input [3:0] pc;
@@ -121,7 +118,6 @@ module memory(pc, op, im);
         $write("[%t] memory(%b): %b\n", $time, pc, {op, im});
     end
 endmodule
-*/
 
 module register(clk, rst, ld, in, q);
     input wire clk, rst;
