@@ -7,10 +7,10 @@ module data_selector(op, r1, r2, y);
 
     always @* begin
         case({a, b})
-            2'b00: y = r1; 
-            2'b01: y = r2; 
-            2'b10: y = 4'b0; 
-            2'b11: y = 4'b0; 
+            2'b00: y <= r1;
+            2'b01: y <= r2;
+            2'b10: y <= 4'b0;
+            2'b11: y <= 4'b0;
         endcase
         $write("[%t] data selector(op: %b, a: %b, b: %b): %b):\n", $time, op, a, b, y);
     end

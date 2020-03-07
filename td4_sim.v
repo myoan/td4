@@ -10,11 +10,11 @@ module top();
 
   initial begin
     RST_X = 1;
-    #2 RST_X = 0;
+    #20 RST_X = 0;
   end
 
   initial begin
-    #500 $finish();
+    #5000 $finish();
   end
 
   initial begin

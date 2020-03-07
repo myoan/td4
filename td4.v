@@ -1,4 +1,4 @@
-`define LEN_CLOCK 500000
+`define LEN_CLOCK 50000000
 module td4(clk, rst, led);
     input clk, rst;
     wire a, b, cout;
@@ -11,16 +11,16 @@ module td4(clk, rst, led);
     reg td4_clk;
 
     initial begin
-        td4_clk = 0;
+        td4_clk = 1'b0;
     end
 
     always @(posedge clk) begin
         if (rst | counter == `LEN_CLOCK - 1) begin
-	          counter <= 0;
-	          td4_clk <= ~td4_clk;
-	      end else
-	          counter <= counter + 1'b1;
-	  end
+	        counter <= 0;
+	        td4_clk <= ~td4_clk;
+            $write("[%t] click c: %b\n", $time, counter);
+	    end else counter <= counter + 1'b1;
+    end
 
     memory mem_ins(.pc(q3),.op(op),.im(im));
     decoder dcd_ins(.op(op),.cin(c),.a(a),.b(b),.s(s));
@@ -29,7 +29,8 @@ module td4(clk, rst, led);
     alu a_ins(.y(y),.im(im),.sgm(in),.cout(cout));
 
     always @(cout) begin
-        c = cout;
+        $write("[%t] exec ALU: cout: %b, sgm: %b\n", $time, cout, in);
+        c <= cout;
     end
 
     register r1_ins(.clk(td4_clk),.rst(rst),.ld(s[3]),.in(in),.q(q0));
@@ -63,6 +64,29 @@ module memory(pc, op, im);
 endmodule
 */
 
+// 1min timer
+module memory(pc, op, im);
+    input [3:0] pc;
+    output reg[3:0] op, im;
+
+    always @(pc) begin
+        case(pc)
+
+            4'b0000: {op, im} = 8'b10110000; // OUT 0000
+            4'b0001: {op, im} = 8'b10110100; // OUT 0100
+
+            4'b0010: {op, im} = 8'b00000001; // ADD A,0001
+            4'b0011: {op, im} = 8'b11100000; // JNC 0000
+            4'b0100: {op, im} = 8'b10111000; // OUT 1000
+            4'b0101: {op, im} = 8'b11110101; // JMP 1111
+            default: {op, im} = 8'b00000000;
+        endcase
+        $write("[%t] memory(%b): %b\n", $time, pc, {op, im});
+    end
+endmodule
+
+
+/*
 // 3min timer
 module memory(pc, op, im);
     input [3:0] pc;
@@ -93,6 +117,7 @@ module memory(pc, op, im);
         $write("[%t] memory(%b): %b\n", $time, pc, {op, im});
     end
 endmodule
+*/
 
 module register(clk, rst, ld, in, q);
     input wire clk, rst;
@@ -105,6 +130,7 @@ module register(clk, rst, ld, in, q);
             q <= 4'h0;
         else if (ld == 1'b0)
             q <= in;
+        $write("[%t] reg: rst: %b, ld: %b, in: %b, q:%b\n", $time, rst, ld, in, q);
     end
 endmodule
 
@@ -116,11 +142,11 @@ module program_counter(clk, rst, ld, in, q);
 
     always @(posedge clk) begin
         if (rst)
-            q = 4'h0;
+            q <= 4'h0;
         else if (ld == 1'b0)
-            q = in;
+            q <= in;
         else
-            q = q + 1;
+            q <= q + 1;
         $write("[%t] pc: rst: %b, ld: %b, in: %b, q:%b\n", $time, rst, ld, in, q);
     end
 endmodule
